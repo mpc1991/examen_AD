@@ -285,7 +285,6 @@ public class U6_DataAccess_MongoDB {
         mcol.insertMany(documents);
     }
     // UPDATE
-
     public static void updateCategoryById(Categoria categoria, String nouValor) throws PersException {
         MongoCollection mcol = getConnection();
         Bson filtro = Filters.eq("category.categoryId", categoria.getId());
@@ -299,7 +298,6 @@ public class U6_DataAccess_MongoDB {
 
         mcol.updateOne(filtro, update);
     }
-
     // DELETE
     public static void deleteCategory(Categoria categoria) throws PersException {
         MongoCollection mcol = getConnection();
