@@ -1,3 +1,13 @@
-net\porcel\test_examen_presencial\data\DataAccess.class
+net\porcel\test_examen_presencial\dto\Servidor.class
+net\porcel\test_examen_presencial\dto\TServidor.class
+net\porcel\test_examen_presencial\data\ex4pc.class
+net\porcel\test_examen_presencial\dto\Llibre.class
 net\porcel\test_examen_presencial\dto\Modul.class
+net\porcel\test_examen_presencial\data\ex1escrito_test.class
+net\porcel\test_examen_presencial\data\ex3pc.class
 net\porcel\test_examen_presencial\Test_examen_presencial.class
+net\porcel\test_examen_presencial\data\ex2pc.class
+net\porcel\test_examen_presencial\aux\TractarValors.class
+net\porcel\test_examen_presencial\data\ex2escrito_test.class
+net\porcel\test_examen_presencial\dto\Categoria.class
+net\porcel\test_examen_presencial\data\ex1pc.class

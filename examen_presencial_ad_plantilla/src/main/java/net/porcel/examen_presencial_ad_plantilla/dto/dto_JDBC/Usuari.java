@@ -1,9 +1,10 @@
 
 package net.porcel.examen_presencial_ad_plantilla.dto.dto_JDBC;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Usuari {
+public class Usuari implements Serializable{
     int id;
     String nom;
     String llinatges;

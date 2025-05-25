@@ -40,8 +40,9 @@ actor: Array (10)
 language: Object
     value: "English"
     languageId: 1
-*/
+ */
 public class U6_DataAccess_MongoDB {
+
     private static String url;
     private static String bbdd;
     private static String colection;
@@ -67,6 +68,7 @@ public class U6_DataAccess_MongoDB {
         }
         return mongoCollection;
     }
+
     public static ArrayList<Document> getDocumentsBSON() throws PersException {
         ArrayList<Document> documents = new ArrayList<>();
         MongoCollection<Document> mongoCollection = null;
@@ -80,6 +82,7 @@ public class U6_DataAccess_MongoDB {
         }
         return documents;
     }
+
     public static List<Categoria> getCategoriesBSON() throws PersException {
         List<Categoria> categorias = new ArrayList<>(); // Lista de objetos Categoria
         List<Document> documents = new ArrayList<>(); // Lista de Document que nos devuelve MongoDB
@@ -95,7 +98,7 @@ public class U6_DataAccess_MongoDB {
                     Projections.include("category.value", "category.categoryId")
             );
             Bson sort = Sorts.descending("category.value");
-            
+
             mongoCollection.find(filter)
                     .projection(projection)
                     .sort(sort)
@@ -105,13 +108,15 @@ public class U6_DataAccess_MongoDB {
             for (Document document : documents) { // por cada documento, creamos un POJO y lo añadimos a su lista
                 // Extraemos el array "category" (es una lista de subdocumentos)
                 List<Document> documentsObtained = (List<Document>) document.get("category");
-                
-                // Recorremos cada subdocumento dentro del array "category"
-                for (Document cat : documentsObtained) {
-                    Categoria categoria = new Categoria();
-                    categoria.setId(cat.getInteger("categoryId")); // Obtenemos el campo categoryId del subdocumento y lo asignamos
-                    categoria.setValor(cat.getString("value")); // Obtenemos el campo value del subdocumento y lo asignamos
-                    categorias.add(categoria);
+
+                if (documentsObtained != null) {
+                    // Recorremos cada subdocumento dentro del array "category"
+                    for (Document cat : documentsObtained) {
+                        Categoria categoria = new Categoria();
+                        categoria.setId(cat.getInteger("categoryId")); // Obtenemos el campo categoryId del subdocumento y lo asignamos
+                        categoria.setValor(cat.getString("value")); // Obtenemos el campo value del subdocumento y lo asignamos
+                        categorias.add(categoria);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -119,6 +124,7 @@ public class U6_DataAccess_MongoDB {
         }
         return categorias; // devolvemos una lista de POJO
     }
+
     public static List<Categoria> getCategoriesAggre() throws PersException {
         List<Categoria> categorias = new ArrayList<>(); // Lista de objetos Categoria
         List<Document> documents = new ArrayList<>(); // Lista de Document que nos devuelve MongoDB
@@ -127,8 +133,8 @@ public class U6_DataAccess_MongoDB {
             MongoCollection mongoCollection = getConnection();
 
             mongoCollection.aggregate(List.of(
-                     // 1. unwind: descompone el array "category" para que cada elemento sea un documento separado
-                    unwind("$category"), 
+                    // 1. unwind: descompone el array "category" para que cada elemento sea un documento separado
+                    unwind("$category"),
                     // 2. group: agrupamos por los campos "categoryId" y "value" dentro de "category"
                     // Esto permite eliminar categorías duplicadas que puedan estar en distintos documentos
                     group(new Document("categoryId", "$category.categoryId") //campo nuevo documento/BBDD
@@ -159,6 +165,7 @@ public class U6_DataAccess_MongoDB {
         }
         return categorias; // devolvemos una lista de POJO
     }
+
     public static List<Actor> getActorsAggre() throws PersException {
         List<Actor> actors = new ArrayList<>();
         List<Document> documents = new ArrayList<>();
@@ -167,10 +174,10 @@ public class U6_DataAccess_MongoDB {
             MongoCollection<Document> mongoCollection = getConnection();
             mongoCollection.aggregate(List.of(
                     unwind("$actor"),
-                    group(new Document("actorId", "$actor.actorId") 
-                            .append("firstName", "$actor.firstName") 
-                            .append("lastName", "$actor.lastName")), 
-                    sort(ascending("_id.firstName")) 
+                    group(new Document("actorId", "$actor.actorId")
+                            .append("firstName", "$actor.firstName")
+                            .append("lastName", "$actor.lastName")),
+                    sort(ascending("_id.firstName"))
             )).into(documents);
 
             for (Document document : documents) {
@@ -187,6 +194,7 @@ public class U6_DataAccess_MongoDB {
         }
         return actors;
     }
+
     public static List<Film> getFilmsByActorAndCategory(Integer idActor, Integer idCategory) throws PersException {
         List<Document> documents = new ArrayList<>();
         List<Film> films = new ArrayList<>();
@@ -259,25 +267,26 @@ public class U6_DataAccess_MongoDB {
     }
 
     // INSERT
-    public static void addCategory(Categoria categoria) throws PersException{
-        List<Document> documents = new ArrayList();        
+    public static void addCategory(Categoria categoria) throws PersException {
+        List<Document> documents = new ArrayList();
         MongoCollection mcol = getConnection();
-        
+
         // Construimos el subdocumento que representa un elemento del array "category"
         // NOTA: Los campos deben coincidir con la estructura esperada en MongoDB para categoría
-        Document subDocument = new Document ("categoryId", categoria.getId())   // Campo categoryId, igual al id del POJO
-            .append("value", categoria.getValor());                             // Campo value, igual al valor del POJO
-        
+        Document subDocument = new Document("categoryId", categoria.getId()) // Campo categoryId, igual al id del POJO
+                .append("value", categoria.getValor());                             // Campo value, igual al valor del POJO
+
         // Creamos el documento principal que contiene el array "category" con un único elemento: el subdocumento creado arriba
         // En la base de datos, cada documento tendría una estructura con un campo "category" que es un array de documentos
         Document document = new Document("category", List.of(subDocument));
-        
+
         documents.add(document);
         mcol.insertOne(document);
         mcol.insertMany(documents);
     }
-   // UPDATE
-    public static void updateCategoryById(Categoria categoria, String nouValor) throws PersException{
+    // UPDATE
+
+    public static void updateCategoryById(Categoria categoria, String nouValor) throws PersException {
         MongoCollection mcol = getConnection();
         Bson filtro = Filters.eq("category.categoryId", categoria.getId());
 
@@ -287,11 +296,12 @@ public class U6_DataAccess_MongoDB {
                 Updates.set("category.$.categoryId", categoria.getId()), //mantenemos el valor
                 Updates.set("category.$.value", nouValor)
         );
-        
+
         mcol.updateOne(filtro, update);
     }
+
     // DELETE
-    public static void deleteCategory(Categoria categoria) throws PersException{
+    public static void deleteCategory(Categoria categoria) throws PersException {
         MongoCollection mcol = getConnection();
         Bson filter = Filters.eq("category.categoryId", categoria.getId());
         mcol.deleteOne(filter);
