@@ -9,9 +9,6 @@ import java.nio.file.Path;
 import net.porcel.test_examen_presencial.data.ex1escrito_test;
 import net.porcel.test_examen_presencial.data.ex3pc;
 import net.porcel.test_examen_presencial.data.ex4pc;
-import net.porcel.test_examen_presencial.dto.Llibre;
-import net.porcel.test_examen_presencial.dto.Servidor;
-import net.porcel.test_examen_presencial.dto.TServidor;
 
 public class Test_examen_presencial {
 
